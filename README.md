@@ -1,6 +1,8 @@
-# Smart Farming Assistant
+# 🌱 Smart Farming Assistant - AI-Powered Farming Platform
 
-A comprehensive AI-powered farming platform that helps farmers with crop monitoring, weather updates, marketplace, community forum, and intelligent farming advice.
+**Live Website**: https://smartfarming2024.github.io/smart-farming-assistant
+
+A comprehensive AI-powered farming platform with unique features like Hindi Voice Assistant, AR Crop Scanner, and real-time disease detection.
 
 ## 🌟 Features
 
