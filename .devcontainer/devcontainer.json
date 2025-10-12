@@ -1,0 +1,23 @@
+{
+  "name": "Smart Farming Assistant",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:18",
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "forwardPorts": [3001],
+  "portsAttributes": {
+    "3001": {
+      "label": "Smart Farming App",
+      "onAutoForward": "notify"
+    }
+  },
+  "postCreateCommand": "npm install && cd client && npm install",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.vscode-json",
+        "bradlc.vscode-tailwindcss"
+      ]
+    }
+  }
+}
