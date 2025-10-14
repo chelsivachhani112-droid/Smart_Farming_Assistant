@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: smart-farming-assistant
+    env: node
+    plan: free
+    buildCommand: cd client && npm install && npm run build
+    startCommand: node deploy-everywhere.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
