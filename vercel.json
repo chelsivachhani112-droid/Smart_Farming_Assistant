@@ -1,27 +1,9 @@
 {
-  "name": "smart-farming-assistant",
   "version": 2,
   "builds": [
-    {
-      "src": "deploy-everywhere.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "client/build/**",
-      "use": "@vercel/static"
-    }
+    { "src": "index.js", "use": "@vercel/node" }
   ],
   "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/deploy-everywhere.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/client/build/$1"
-    }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  }
+    { "src": "/(.*)", "dest": "/index.js" }
+  ]
 }
