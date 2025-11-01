@@ -34,7 +34,7 @@
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build"
   },
-  "homepage": "https://smartfarming2024.github.io/smart-farming-assistant",
+  "homepage": "/",
   "eslintConfig": {
     "extends": [
       "react-app",
