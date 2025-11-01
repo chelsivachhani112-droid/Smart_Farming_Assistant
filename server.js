@@ -14,6 +14,7 @@ const marketRoutes = require('./routes/market');
 const forumRoutes = require('./routes/forum');
 const adminRoutes = require('./routes/admin');
 const chatbotRoutes = require('./routes/chatbot');
+const voiceAssistantRoutes = require('./routes/voice-assistant');
 
 dotenv.config();
 
@@ -47,6 +48,7 @@ app.use('/api/market', marketRoutes);
 app.use('/api/forum', forumRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/chatbot', chatbotRoutes);
+app.use('/api/voice-assistant', voiceAssistantRoutes);
 
 // Serve React app
 app.get('*', (req, res) => {

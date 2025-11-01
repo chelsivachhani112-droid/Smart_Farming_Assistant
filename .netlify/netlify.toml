@@ -1,14 +1,28 @@
+redirectsOrigin = "config"
 plugins = []
+functionsDirectory = "C:\\Users\\admin\\CascadeProjects\\smart-farming-assistant\\api"
+functionsDirectoryOrigin = "config-v1"
 headers = []
-redirects = []
+
+[dev]
+command = "npm run dev"
+port = 3000.0
+
+[env]
+
+[env.production]
+NODE_ENV = "production"
 
 [functions]
 
 [functions."*"]
 
 [build]
-publish = "C:\\Users\\admin\\CascadeProjects\\smart-farming-assistant"
-publishOrigin = "default"
+publish = "C:\\Users\\admin\\CascadeProjects\\smart-farming-assistant\\client\\build"
+publishOrigin = "config"
+commandOrigin = "config"
+command = "npm install && npm run build"
+functions = "C:\\Users\\admin\\CascadeProjects\\smart-farming-assistant\\api"
 
 [build.environment]
 
@@ -23,3 +37,27 @@ publishOrigin = "default"
 [build.processing.js]
 
 [build.services]
+
+[[redirects]]
+from = "/api/*"
+to = "/.netlify/functions/server"
+status = 200.0
+force = false
+
+[redirects.query]
+
+[redirects.conditions]
+
+[redirects.headers]
+
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200.0
+force = false
+
+[redirects.query]
+
+[redirects.conditions]
+
+[redirects.headers]
