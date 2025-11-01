@@ -11,17 +11,13 @@ router.get('/current', protect, async (req, res) => {
   try {
     const { lat, lon } = req.query;
     
-    if (!lat || !lon) {
-      // Use user's location from profile or default to Delhi
-      const defaultLat = req.user.location?.coordinates?.latitude || 28.6139;
-      const defaultLon = req.user.location?.coordinates?.longitude || 77.2090;
-      
-      return getWeatherData(defaultLat, defaultLon, res);
-    }
+    const latitude = lat || req.user.location?.coordinates?.latitude || 28.6139;
+    const longitude = lon || req.user.location?.coordinates?.longitude || 77.2090;
     
-    await getWeatherData(lat, lon, res);
+    await getWeatherData(latitude, longitude, res);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('Weather API error:', error);
+    res.status(500).json({ message: 'Failed to fetch weather data', error: error.message });
   }
 });
 
