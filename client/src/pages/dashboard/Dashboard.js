@@ -185,6 +185,13 @@ const Dashboard = () => {
       icon: <Mic className="w-6 h-6" />,
       link: '/voice-assistant',
       color: 'bg-red-500'
+    },
+    {
+      title: 'Market Prices',
+      description: 'Real-time crop prices',
+      icon: <TrendingUp className="w-6 h-6" />,
+      link: '/market-prices',
+      color: 'bg-yellow-500'
     }
   ];
 

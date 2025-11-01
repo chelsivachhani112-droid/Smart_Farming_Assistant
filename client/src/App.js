@@ -16,6 +16,7 @@ import CompleteDashboard from './pages/dashboard/CompleteDashboard';
 import CropMonitoring from './pages/crops/CropMonitoring';
 import WeatherPage from './pages/weather/WeatherPage';
 import MarketplacePage from './pages/marketplace/MarketplacePage';
+import MarketPrices from './pages/marketplace/MarketPrices';
 import ProductDetailsPage from './pages/marketplace/ProductDetailsPage';
 import ForumPage from './pages/forum/ForumPage';
 import ChatbotPage from './pages/chatbot/ChatbotPage';
@@ -118,6 +119,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <MarketplacePage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/market-prices" 
+            element={
+              <ProtectedRoute>
+                <MarketPrices />
               </ProtectedRoute>
             } 
           />

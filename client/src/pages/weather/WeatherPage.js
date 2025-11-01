@@ -13,7 +13,9 @@ import {
   AlertTriangle,
   TrendingUp,
   Calendar,
-  MapPin
+  MapPin,
+  Search,
+  Loader
 } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -25,33 +27,75 @@ const WeatherPage = () => {
   const [insights, setInsights] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedTab, setSelectedTab] = useState('current');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [city, setCity] = useState('Delhi');
+  const [state, setState] = useState('Delhi');
 
   useEffect(() => {
-    fetchWeatherData();
+    fetchWeatherData(city, state);
   }, []);
 
-  const fetchWeatherData = async () => {
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) {
+      toast.error('Please enter city name');
+      return;
+    }
+    setSearchLoading(true);
+    try {
+      // Parse search query (can be "city" or "city, state")
+      const parts = searchQuery.split(',').map(p => p.trim());
+      const searchCity = parts[0];
+      const searchState = parts[1] || '';
+      
+      await fetchWeatherData(searchCity, searchState);
+      setCity(searchCity);
+      setState(searchState);
+      setSearchQuery('');
+      toast.success(`Weather loaded for ${searchCity}`);
+    } catch (error) {
+      toast.error('City not found');
+    } finally {
+      setSearchLoading(false);
+    }
+  };
+
+  const fetchWeatherData = async (searchCity = 'Delhi', searchState = 'Delhi') => {
     try {
       setLoading(true);
       
-      // Try to fetch from API, fallback to mock data
+      // Try to fetch from API with city/state, fallback to mock data
       try {
-        const currentResponse = await axios.get('/api/weather/current', { timeout: 5000 });
+        const params = new URLSearchParams();
+        if (searchCity) params.append('city', searchCity);
+        if (searchState) params.append('state', searchState);
+        
+        const currentResponse = await axios.get(`/api/weather/current?${params.toString()}`, { timeout: 5000 });
         setCurrentWeather(currentResponse.data);
       } catch (err) {
-        console.log('Using mock weather data');
-        setCurrentWeather(getMockCurrentWeather());
+        console.log('Using mock weather data for', searchCity);
+        setCurrentWeather(getMockCurrentWeather(searchCity, searchState));
       }
 
       try {
-        const forecastResponse = await axios.get('/api/weather/forecast?days=7', { timeout: 5000 });
+        const params = new URLSearchParams();
+        if (searchCity) params.append('city', searchCity);
+        if (searchState) params.append('state', searchState);
+        params.append('days', '7');
+        
+        const forecastResponse = await axios.get(`/api/weather/forecast?${params.toString()}`, { timeout: 5000 });
         setForecast(forecastResponse.data.forecast || forecastResponse.data);
       } catch (err) {
         setForecast(getMockForecast());
       }
 
       try {
-        const alertsResponse = await axios.get('/api/weather/alerts', { timeout: 5000 });
+        const params = new URLSearchParams();
+        if (searchCity) params.append('city', searchCity);
+        if (searchState) params.append('state', searchState);
+        
+        const alertsResponse = await axios.get(`/api/weather/alerts?${params.toString()}`, { timeout: 5000 });
         setAlerts(alertsResponse.data);
       } catch (err) {
         setAlerts(getMockAlerts());
@@ -67,7 +111,7 @@ const WeatherPage = () => {
     } catch (error) {
       console.error('Weather fetch error:', error);
       // Set mock data as fallback
-      setCurrentWeather(getMockCurrentWeather());
+      setCurrentWeather(getMockCurrentWeather(searchCity, searchState));
       setForecast(getMockForecast());
       setAlerts(getMockAlerts());
       setInsights(getMockInsights());
@@ -76,9 +120,9 @@ const WeatherPage = () => {
     }
   };
 
-  const getMockCurrentWeather = () => ({
+  const getMockCurrentWeather = (searchCity = 'Delhi', searchState = 'Delhi') => ({
     timestamp: new Date().toISOString(),
-    location: { city: 'Delhi', state: 'Delhi', country: 'India' },
+    location: { city: searchCity || 'Delhi', state: searchState || 'Delhi', country: 'India' },
     current: {
       temperature: 28,
       feelsLike: 30,
@@ -279,11 +323,47 @@ const WeatherPage = () => {
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Weather Dashboard</h1>
-          <div className="flex items-center space-x-2 text-gray-600">
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">🌤️ Weather Dashboard</h1>
+          <div className="flex items-center space-x-2 text-gray-600 mb-4">
             <MapPin className="w-4 h-4" />
             <span>{currentWeather?.location?.city || 'Your Location'}</span>
+            {currentWeather?.location?.state && (
+              <>
+                <span>,</span>
+                <span>{currentWeather.location.state}</span>
+              </>
+            )}
           </div>
+
+          {/* Search Bar */}
+          <form onSubmit={handleSearch} className="flex gap-2 mb-6">
+            <div className="flex-1 relative">
+              <input
+                type="text"
+                placeholder="Search city (e.g., Mumbai or Mumbai, Maharashtra)"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={searchLoading}
+              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 flex items-center gap-2"
+            >
+              {searchLoading ? (
+                <>
+                  <Loader className="w-4 h-4 animate-spin" />
+                  Searching...
+                </>
+              ) : (
+                <>
+                  <Search className="w-4 h-4" />
+                  Search
+                </>
+              )}
+            </button>
+          </form>
         </div>
 
         {/* Weather Alerts */}
