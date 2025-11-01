@@ -23,7 +23,9 @@ const PORT = process.env.PORT || 5000;
 // Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100 // limit each IP to 100 requests per windowMs
+  max: 100, // limit each IP to 100 requests per windowMs
+  skip: (req, res) => process.env.NODE_ENV !== 'production', // Skip in development
+  handler: (req, res) => res.status(429).json({ message: 'Too many requests' })
 });
 
 // Middleware
@@ -51,13 +53,18 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
 });
 
-// MongoDB connection
+// MongoDB connection (non-blocking - frontend will still load)
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/smart-farming', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+  serverSelectionTimeoutMS: 5000,
+  socketTimeoutMS: 5000,
 })
-.then(() => console.log('MongoDB connected successfully'))
-.catch(err => console.log('MongoDB connection error:', err));
+.then(() => console.log('✅ MongoDB connected successfully'))
+.catch(err => {
+  console.log('⚠️ MongoDB connection error (frontend will still work):', err.message);
+  console.log('💡 To enable backend features, set MONGODB_URI in .env file');
+});
 
 // Error handling middleware
 app.use((err, req, res, next) => {
