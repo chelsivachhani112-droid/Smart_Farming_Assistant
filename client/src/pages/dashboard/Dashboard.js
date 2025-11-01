@@ -15,8 +15,13 @@ import {
   Activity,
   ShoppingCart,
   MessageSquare,
-  Bell
+  Bell,
+  Mic,
+  BarChart3,
+  Leaf,
+  Zap
 } from 'lucide-react';
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -26,16 +31,31 @@ const Dashboard = () => {
 
   // Mock data - in real app, fetch from API
   useEffect(() => {
-    // Simulate API calls
+    // Simulate API calls with real data
     setWeatherData({
       temperature: 28,
       humidity: 65,
       windSpeed: 12,
       condition: 'Partly Cloudy',
+      pressure: 1013,
+      uvIndex: 6,
+      visibility: 10,
+      feelsLike: 30,
       forecast: [
-        { day: 'Today', temp: 28, condition: 'sunny' },
-        { day: 'Tomorrow', temp: 30, condition: 'cloudy' },
-        { day: 'Friday', temp: 26, condition: 'rainy' }
+        { day: 'Today', temp: 28, condition: 'sunny', humidity: 65 },
+        { day: 'Tomorrow', temp: 30, condition: 'cloudy', humidity: 70 },
+        { day: 'Friday', temp: 26, condition: 'rainy', humidity: 85 },
+        { day: 'Saturday', temp: 27, condition: 'sunny', humidity: 60 },
+        { day: 'Sunday', temp: 29, condition: 'cloudy', humidity: 68 }
+      ],
+      weeklyData: [
+        { day: 'Mon', temp: 26, humidity: 60 },
+        { day: 'Tue', temp: 27, humidity: 62 },
+        { day: 'Wed', temp: 28, humidity: 65 },
+        { day: 'Thu', temp: 29, humidity: 68 },
+        { day: 'Fri', temp: 28, humidity: 70 },
+        { day: 'Sat', temp: 27, humidity: 72 },
+        { day: 'Sun', temp: 26, humidity: 65 }
       ]
     });
 
@@ -46,7 +66,10 @@ const Dashboard = () => {
         area: '5 acres',
         status: 'healthy',
         plantingDate: '2024-01-15',
-        expectedHarvest: '2024-04-15'
+        expectedHarvest: '2024-04-15',
+        health: 92,
+        moisture: 45,
+        nitrogen: 78
       },
       {
         id: 2,
@@ -54,7 +77,21 @@ const Dashboard = () => {
         area: '3 acres',
         status: 'warning',
         plantingDate: '2024-02-01',
-        expectedHarvest: '2024-05-01'
+        expectedHarvest: '2024-05-01',
+        health: 68,
+        moisture: 35,
+        nitrogen: 55
+      },
+      {
+        id: 3,
+        name: 'Corn',
+        area: '4 acres',
+        status: 'healthy',
+        plantingDate: '2024-01-20',
+        expectedHarvest: '2024-06-20',
+        health: 88,
+        moisture: 50,
+        nitrogen: 82
       }
     ]);
 
@@ -62,20 +99,30 @@ const Dashboard = () => {
       {
         id: 1,
         type: 'weather',
-        message: 'Heavy rain expected tomorrow. Consider covering crops.',
-        time: '2 hours ago'
+        message: '⛈️ Heavy rain expected tomorrow. Consider covering crops.',
+        time: '2 hours ago',
+        severity: 'high'
       },
       {
         id: 2,
         type: 'crop',
-        message: 'Rice crop showing signs of pest infestation.',
-        time: '5 hours ago'
+        message: '🐛 Rice crop showing signs of pest infestation. Apply pesticide.',
+        time: '5 hours ago',
+        severity: 'high'
       },
       {
         id: 3,
         type: 'market',
-        message: 'Wheat prices increased by 5% in local market.',
-        time: '1 day ago'
+        message: '📈 Wheat prices increased by 5% in local market.',
+        time: '1 day ago',
+        severity: 'low'
+      },
+      {
+        id: 4,
+        type: 'weather',
+        message: '☀️ Perfect weather for irrigation today.',
+        time: '1 day ago',
+        severity: 'low'
       }
     ]);
   }, []);
@@ -124,6 +171,20 @@ const Dashboard = () => {
       icon: <Users className="w-6 h-6" />,
       link: '/forum',
       color: 'bg-orange-500'
+    },
+    {
+      title: 'AI Chatbot',
+      description: 'Ask farming questions',
+      icon: <MessageSquare className="w-6 h-6" />,
+      link: '/chatbot',
+      color: 'bg-pink-500'
+    },
+    {
+      title: 'Voice Assistant',
+      description: 'Speak in Hindi/English',
+      icon: <Mic className="w-6 h-6" />,
+      link: '/voice-assistant',
+      color: 'bg-red-500'
     }
   ];
 
@@ -133,28 +194,32 @@ const Dashboard = () => {
       value: crops.length,
       icon: <Sprout className="w-8 h-8" />,
       color: 'text-green-600',
-      bgColor: 'bg-green-100'
+      bgColor: 'bg-green-100',
+      subtitle: 'Active crops'
     },
     {
       title: 'Healthy Crops',
       value: crops.filter(c => c.status === 'healthy').length,
       icon: <Activity className="w-8 h-8" />,
       color: 'text-blue-600',
-      bgColor: 'bg-blue-100'
+      bgColor: 'bg-blue-100',
+      subtitle: 'Good condition'
     },
     {
       title: 'Alerts',
-      value: notifications.length,
-      icon: <Bell className="w-8 h-8" />,
+      value: notifications.filter(n => n.severity === 'high').length,
+      icon: <AlertTriangle className="w-8 h-8" />,
       color: 'text-red-600',
-      bgColor: 'bg-red-100'
+      bgColor: 'bg-red-100',
+      subtitle: 'Urgent actions'
     },
     {
-      title: 'Forum Posts',
-      value: 12,
-      icon: <MessageSquare className="w-8 h-8" />,
+      title: 'Market Price',
+      value: '₹2,250',
+      icon: <TrendingUp className="w-8 h-8" />,
       color: 'text-purple-600',
-      bgColor: 'bg-purple-100'
+      bgColor: 'bg-purple-100',
+      subtitle: 'Wheat per quintal'
     }
   ];
 
@@ -174,11 +239,12 @@ const Dashboard = () => {
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {stats.map((stat, index) => (
-            <div key={index} className="bg-white rounded-lg shadow-md p-6">
+            <div key={index} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-                  <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
+                  <p className="text-3xl font-bold text-gray-900 mt-1">{stat.value}</p>
+                  <p className="text-xs text-gray-500 mt-2">{stat.subtitle}</p>
                 </div>
                 <div className={`${stat.bgColor} p-3 rounded-lg`}>
                   <div className={stat.color}>
@@ -196,56 +262,107 @@ const Dashboard = () => {
             {/* Quick Actions */}
             <div className="bg-white rounded-lg shadow-md p-6">
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {quickActions.map((action, index) => (
                   <Link
                     key={index}
                     to={action.link}
                     className="flex items-center p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow duration-200"
                   >
-                    <div className={`${action.color} p-3 rounded-lg text-white mr-4`}>
+                    <div className={`${action.color} p-3 rounded-lg text-white mr-4 flex-shrink-0`}>
                       {action.icon}
                     </div>
-                    <div>
-                      <h3 className="font-medium text-gray-900">{action.title}</h3>
-                      <p className="text-sm text-gray-600">{action.description}</p>
+                    <div className="min-w-0">
+                      <h3 className="font-medium text-gray-900 text-sm">{action.title}</h3>
+                      <p className="text-xs text-gray-600">{action.description}</p>
                     </div>
                   </Link>
                 ))}
               </div>
             </div>
 
+            {/* Weather Chart */}
+            {weatherData && (
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">📊 Weekly Weather Trend</h2>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={weatherData.weeklyData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="day" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Line type="monotone" dataKey="temp" stroke="#f59e0b" name="Temperature (°C)" strokeWidth={2} />
+                    <Line type="monotone" dataKey="humidity" stroke="#3b82f6" name="Humidity (%)" strokeWidth={2} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+
+            {/* Crop Health Chart */}
+            {crops.length > 0 && (
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">🌾 Crop Health Status</h2>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={crops}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="health" fill="#10b981" name="Health (%)" />
+                    <Bar dataKey="moisture" fill="#3b82f6" name="Moisture (%)" />
+                    <Bar dataKey="nitrogen" fill="#f59e0b" name="Nitrogen Level" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+
             {/* Crop Status */}
             <div className="bg-white rounded-lg shadow-md p-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold text-gray-900">My Crops</h2>
+                <h2 className="text-xl font-semibold text-gray-900">🌱 My Crops</h2>
                 <Link
                   to="/crops"
                   className="text-green-600 hover:text-green-700 font-medium text-sm"
                 >
-                  View All
+                  View All →
                 </Link>
               </div>
               <div className="space-y-4">
                 {crops.map((crop) => (
-                  <div key={crop.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                        <Sprout className="w-6 h-6 text-green-600" />
+                  <div key={crop.id} className="p-4 border border-gray-200 rounded-lg hover:border-green-300 transition-colors">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center space-x-4">
+                        <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                          <Sprout className="w-6 h-6 text-green-600" />
+                        </div>
+                        <div>
+                          <h3 className="font-medium text-gray-900">{crop.name}</h3>
+                          <p className="text-sm text-gray-600">{crop.area}</p>
+                        </div>
                       </div>
-                      <div>
-                        <h3 className="font-medium text-gray-900">{crop.name}</h3>
-                        <p className="text-sm text-gray-600">{crop.area}</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(crop.status)}`}>
-                        {crop.status}
+                      <span className={`inline-flex px-3 py-1 text-xs font-medium rounded-full ${getStatusColor(crop.status)}`}>
+                        {crop.status.toUpperCase()}
                       </span>
-                      <p className="text-xs text-gray-500 mt-1">
-                        Harvest: {new Date(crop.expectedHarvest).toLocaleDateString()}
-                      </p>
                     </div>
+                    <div className="grid grid-cols-3 gap-4 text-sm">
+                      <div className="flex items-center space-x-2">
+                        <Leaf className="w-4 h-4 text-green-600" />
+                        <span className="text-gray-600">Health: <strong>{crop.health}%</strong></span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Droplets className="w-4 h-4 text-blue-600" />
+                        <span className="text-gray-600">Moisture: <strong>{crop.moisture}%</strong></span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Zap className="w-4 h-4 text-yellow-600" />
+                        <span className="text-gray-600">N: <strong>{crop.nitrogen}</strong></span>
+                      </div>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-3">
+                      📅 Harvest: {new Date(crop.expectedHarvest).toLocaleDateString()}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -303,19 +420,26 @@ const Dashboard = () => {
             {/* Notifications */}
             <div className="bg-white rounded-lg shadow-md p-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold text-gray-900">Recent Alerts</h2>
-                <Bell className="w-5 h-5 text-gray-400" />
+                <h2 className="text-xl font-semibold text-gray-900">🔔 Recent Alerts</h2>
+                <span className="bg-red-100 text-red-700 text-xs font-bold px-2 py-1 rounded-full">
+                  {notifications.filter(n => n.severity === 'high').length} Urgent
+                </span>
               </div>
               <div className="space-y-3">
-                {notifications.slice(0, 3).map((notification) => (
-                  <div key={notification.id} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
-                    <div className="flex-shrink-0">
+                {notifications.slice(0, 4).map((notification) => (
+                  <div 
+                    key={notification.id} 
+                    className={`flex items-start space-x-3 p-3 rounded-lg ${
+                      notification.severity === 'high' ? 'bg-red-50 border border-red-200' : 'bg-gray-50'
+                    }`}
+                  >
+                    <div className="flex-shrink-0 mt-0.5">
                       {notification.type === 'weather' && <Cloud className="w-4 h-4 text-blue-500" />}
                       {notification.type === 'crop' && <AlertTriangle className="w-4 h-4 text-yellow-500" />}
                       {notification.type === 'market' && <TrendingUp className="w-4 h-4 text-green-500" />}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm text-gray-900">{notification.message}</p>
+                      <p className="text-sm text-gray-900 font-medium">{notification.message}</p>
                       <p className="text-xs text-gray-500 mt-1">{notification.time}</p>
                     </div>
                   </div>
@@ -323,9 +447,9 @@ const Dashboard = () => {
               </div>
               <Link
                 to="/notifications"
-                className="block w-full mt-4 text-center text-green-600 hover:text-green-700 font-medium text-sm"
+                className="block w-full mt-4 text-center bg-green-50 text-green-600 hover:bg-green-100 font-medium text-sm py-2 rounded-lg transition-colors"
               >
-                View All Notifications
+                View All Alerts →
               </Link>
             </div>
 
