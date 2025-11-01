@@ -1,0 +1,21 @@
+[build]
+  command = "npm install && npm run build"
+  functions = "api"
+  publish = "client/build"
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/server"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[dev]
+  command = "npm run dev"
+  port = 3000
+
+[env.production]
+  NODE_ENV = "production"
